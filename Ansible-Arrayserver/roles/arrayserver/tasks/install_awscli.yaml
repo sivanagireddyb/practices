@@ -18,3 +18,7 @@
   register: awscli_op
   failed_when: awscli_op.rc != 0
 
+- name: Delete  tar file after installation
+  file: 
+    path: "{{ base_dir }}/awscli-exe-linux-x86_64.zip"
+    state: absent          

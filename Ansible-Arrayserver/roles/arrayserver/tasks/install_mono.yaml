@@ -90,6 +90,16 @@
       chdir: "{{ mono_install_dir }}"
       target: install
     become: yes
+
+  - name: Making sure mono is installed
+    shell: "{{ mono_cmd_path }}/mono --version"
+    register: mono_v_op
+    failed_when: "mono_v_op.rc != 0"
+
+  - name: Delete  tar file after installation
+    file: 
+      path: "{{ mono_install_dir }}.tar.xz"
+      state: absent      
   when: "mono_version|string not in current_mono.stdout" 
 
 - name: 'Add {{ mono_cmd_path }} if PATH does not exist'

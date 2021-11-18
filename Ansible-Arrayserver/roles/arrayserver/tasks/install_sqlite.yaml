@@ -43,5 +43,10 @@
   - name: Making sure sqlite is installed
     shell: "{{ sqlite_cmd_path }}/sqlite3 --version"
     register: sqlite_op
-    failed_when: "sqlite_op.rc != 0" 
+    failed_when: "sqlite_op.rc != 0"
+
+  - name: Delete  tar file after installation
+    file: 
+      path: "{{ base_dir }}/sqlite-autoconf-{{sqlite_version}}.tar.gz"
+      state: absent           
   when: "sqlite3_op.rc != 0"
