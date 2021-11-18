@@ -82,14 +82,13 @@
       chdir: "{{ mono_install_dir }}"
   
   - name: Running "make" for Mono
-    command: make 
-    args: 
+    make:
       chdir: "{{ mono_install_dir }}"
   
   - name: Running "make install" for Mono
-    command: make install
-    args: 
+    make:
       chdir: "{{ mono_install_dir }}"
+      target: install
     become: yes
   when: "mono_version|string not in current_mono.stdout" 
 

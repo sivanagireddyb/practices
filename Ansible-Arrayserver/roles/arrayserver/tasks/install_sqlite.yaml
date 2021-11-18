@@ -31,14 +31,13 @@
       chdir: "{{ sqlite_install_dir }}"
   
   - name: Running "make" for Sqlite
-    command: make
-    args: 
+    make:
       chdir: "{{sqlite_install_dir}}"
   
   - name: Running "make install" for Sqlite
-    command: make install
-    args: 
+    make:
       chdir: "{{sqlite_install_dir}}"
+      target: install
     become: yes
   
   - name: Making sure sqlite is installed
