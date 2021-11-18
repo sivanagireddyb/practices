@@ -1,0 +1,40 @@
+---
+dev_tool_packages:
+  - gcc 
+  - gcc-c++
+  - bison
+  - pkgconfig
+  - libtool
+  - libstdc++-devel
+  - glib2-devel
+  - gettext
+  - make
+  - freetype-devel
+  - fontconfig-devel
+  - libXft-devel
+  - libpng-devel 
+  - libjpeg-devel
+  - libtiff-devel 
+  - giflib-devel
+  - ghostscript-devel 
+  - libexif-devel
+  - libX11-devel 
+  - wget 
+  - cmake 
+  - libgdiplus
+
+app_user_name: ec2-user
+app_group_name: ec2-user
+base_dir: /opt
+
+#-----Mono Vars------#
+mono_old_version: 4.0.4.1
+mono_version: 6.12.0.122
+mono_old_install_dir: "{{ base_dir }}/mono-{{mono_old_version}}"
+mono_install_dir: "{{ base_dir }}/mono-{{mono_version}}"
+mono_cmd_path: "{{mono_install_dir}}/bin"
+
+#----sqlite---------#
+sqlite_version: 3071401
+sqlite_install_dir: "{{ base_dir }}/sqlite"
+sqlite_cmd_path: "{{sqlite_install_dir}}/bin"

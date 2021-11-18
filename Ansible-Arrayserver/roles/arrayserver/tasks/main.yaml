@@ -1,0 +1,8 @@
+- name: Include install_mono.yaml
+  include: install_mono.yaml
+
+- name: Include install_sqlite.yaml
+  include: install_sqlite.yaml
+
+- name: Include install.yaml
+  include: install.yml

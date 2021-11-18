@@ -1,0 +1,122 @@
+#- name: Install epel repo
+#  command: amazon-linux-extras install epel
+#  become: yes
+#
+#- name: Install Linux packages
+#  yum:
+#    name: "{{ dev_tool_packages }}"
+#    state: latest
+#
+# Installing MONO
+- name: Check for existing mono installation
+  command: "{{ mono_cmd_path }}/mono --version"
+  register: current_mono
+- name: Install Mono
+  block:
+  - name: ensure Mono downlaod dir {{mono_old_version}} exists
+    file:
+      path: "{{ mono_old_install_dir }}"
+      state: directory
+  
+  - name: Download Mono {{mono_old_version}}
+    get_url:
+      url: http://download.mono-project.com/sources/mono/mono-{{mono_old_version}}.tar.bz2
+      dest: "{{ mono_old_install_dir }}.tar.bz2"
+  
+  - name: Unarchive Mono {{mono_old_version}}
+    ansible.builtin.unarchive:
+      src: "{{ mono_old_install_dir }}.tar.bz2"
+      dest: "{{ mono_old_install_dir }}/"
+      creates: "{{ mono_old_install_dir }}/mono"
+      owner: "{{ app_user_name }}"
+      group: "{{ app_group_name }}" 
+      extra_opts: [--strip-components=1]
+      remote_src: yes
+  
+  - name: Running ./configure for Mono
+    command: "./configure  --prefix={{ mono_old_install_dir }} --with-large-heap=yes"
+    args: 
+      chdir: "{{ mono_old_install_dir }}"
+  
+  - name: Running "make" for Mono
+    command: make
+    args: 
+      chdir: "{{ mono_old_install_dir }}"
+  
+  - name: Running "make install" for Mono
+    command: make install
+    args: 
+      chdir: "{{ mono_old_install_dir }}"
+    become: yes
+  when: "{{ mono_old_version }} not in current_mono.stdout"   
+
+
+# Installing Mono New version
+- name: ensure Mono downlaod dir {{mono_version}} exists
+  file:
+    path: "{{ mono_install_dir }}"
+    state: directory
+
+- name: Download Mono {{ mono_version }}
+  get_url:
+    url: http://download.mono-project.com/sources/mono/mono-{{mono_version}}.tar.xz
+    dest: "{{mono_install_dir}}/"
+
+- name: Unarchive Mono {{ mono_version }}
+  ansible.builtin.unarchive:
+    src: "{{ mono_install_dir }}.tar.xz"
+    dest: "{{ mono_install_dir }}"
+    creates: "{{ mono_install_dir }}/mono" 
+    extra_opts: [--strip-components=1]
+    owner: "{{ app_user_name }}"
+    group: "{{ app_group_name }}"     
+    remote_src: yes
+
+- name: Running ./configure for Mono
+  command: "./configure  --prefix={{ mono_install_dir }} --with-large-heap=yes --enable-big-arrays=yes >configure.log 2>&1"
+  args: 
+    chdir: "{{ mono_install_dir }}"
+
+- name: Running "make" for Mono
+  command: make >make.log- 2>&1
+  args: 
+    chdir: "{{ mono_install_dir }}"
+
+- name: Running "make install" for Mono
+  command: make install >makeinstall.log 2>&1
+  args: 
+    chdir: "{{ mono_install_dir }}"
+  become: yes
+
+- name: 'Add {{ mono_cmd_path }} if PATH does not exist'
+  lineinfile:
+    path: /etc/environment
+    line: 'PATH="{{ mono_cmd_path }}"'
+    insertafter: EOF
+  when: lookup('file', '/etc/environment') is not search('^\s*PATH\s*=')
+
+- name: 'Add {{ mono_cmd_path }} to PATH'
+  lineinfile:
+    path: /etc/environment
+    regexp: 'PATH=(["])((?!.*?{{ mono_cmd_path }}).*?)(["])$'
+    line: 'PATH=\1\2:{{ mono_cmd_path }}\3'
+    backrefs: yes
+  when: lookup('file', '/etc/environment') is search('^\s*PATH\s*=') 
+
+- name: Add the root certificates into the Mono Trust store
+  command: "{{mono_cmd_path}}/certmgr --ssl -m https://resources.omicsoft.com"
+  become: yes
+
+- name: Syncs Mono’s certificate store with the system certificate store
+  command: "{{mono_cmd_path}}/cert-sync /etc/ssl/certs/ca-bundle.crt"
+  become: yes
+
+- name: Get libgdiplus lib path
+  command: "/sbin/ldconfig -p | grep libgdiplus | tr ' ' '\n' | grep /"
+  register: libgdiplus_lib
+
+- name: Add libgdiplus lib path to the mono config
+  ansible.builtin.lineinfile:
+    path: "{{ mono_install_dir }}/etc/mono/config"
+    regexp: '^<dllmap dll="gdiplus.dll"'
+    line: '<dllmap dll="gdiplus.dll" target="{{ libgdiplus_lib.stdout }}"/>'
