@@ -1,7 +1,7 @@
 - name: Create base folder for arrayserver
   file: 
     path: "{{ arrayserver_install_dir }}"
-    state: present
+    state: directory
 
 - name: Download arrayserver 
   get_url:
@@ -9,12 +9,14 @@
     dest: "{{ arrayserver_install_dir }}"
 
 - name: Create arrayserver exe
-  command: touch ArrayServerLinuxBeta.exe && mono ./OmicsoftUpdater.exe
+  ansible.builtin.shell: |
+    touch ArrayServerLinuxBeta.exe
+    {{ mono_old_cmd_path}}/mono ./OmicsoftUpdater.exe
   args: 
     chdir: "{{ arrayserver_install_dir }}"
 
 - name: Check ArrayServerLinuxBeta version
-  command: mono ArrayServerLinuxBeta.exe --version
+  command: "{{ mono_old_cmd_path}}/mono ArrayServerLinuxBeta.exe --version"
   args: 
     chdir: "{{ arrayserver_install_dir }}"
   register: arrayserver_ver_op
