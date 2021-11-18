@@ -120,11 +120,14 @@
   become: yes
 
 - name: Get libgdiplus lib path
-  command: "/sbin/ldconfig -p | grep libgdiplus | tr ' ' '\n' | grep /"
+  shell: |
+    /sbin/ldconfig -p | grep libgdiplus | tr ' ' '\n' | grep /
   register: libgdiplus_lib
 
 - name: Add libgdiplus lib path to the mono config
   ansible.builtin.lineinfile:
     path: "{{ mono_install_dir }}/etc/mono/config"
+    insertafter: '<dllmap dll="gdiplus.dll" target="libgdiplus.so.0"  os="!windows"/>'
     regexp: '^<dllmap dll="gdiplus.dll"'
-    line: '<dllmap dll="gdiplus.dll" target="{{ libgdiplus_lib.stdout }}"/>'
+    line: '        <dllmap dll="gdiplus.dll" target="{{ libgdiplus_lib.stdout }}"/>'
+    state: present
