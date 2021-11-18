@@ -42,6 +42,10 @@ sqlite_cmd_path: "{{sqlite_install_dir}}/bin"
 
 #---Arryaserver-----#
 arrayserver_install_dir: "{{ base_dir }}/arrayserver"
+company_name: xxx
+license_number: xxx
+expiration_date: xxx
+license_key: xxx
 
 #----R ----------#
 r_packages:
