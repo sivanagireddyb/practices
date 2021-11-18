@@ -1,0 +1,26 @@
+- name: Install epel repo
+  shell: |
+    amazon-linux-extras install epel -y
+    yum-config-manager --enable epel
+  become: yes
+
+- name: Install R packages
+  yum:
+    name: "{{ r_packages }}"
+    state: latest
+  become: yes
+
+- name: Install R4
+  command: amazon-linux-extras install R4
+  become: yes
+
+- name: Install packages inside R shell
+  shell: |
+    sudo R
+    install.packages("tidyverse")
+    install.packages("BiocManager")
+    install.packages("Seurat")
+    BiocManager::install("DESeq2")
+    library(DESeq2)
+    library(Seurat)
+    

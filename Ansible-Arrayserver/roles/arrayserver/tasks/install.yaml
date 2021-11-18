@@ -1,6 +1,0 @@
-#mkdir /opt/arrayserver
-#cd /opt/arrayserver
-#wget -c http://omicsoft.com/software_update/OmicsoftUpdater.exe
-#touch ArrayServerLinuxBeta.exe
-#mono ./OmicsoftUpdater.exe
-#mono ArrayServerLinuxBeta.exe --version

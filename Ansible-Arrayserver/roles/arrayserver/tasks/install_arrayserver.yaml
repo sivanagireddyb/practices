@@ -37,3 +37,9 @@
     #    extra_opts: [--strip-components=1]
     remote_src: yes
 
+- name: Copy ArrayServerConfig Template
+  template: 
+    src: ArrayServer.cfg.j2
+    dest: "{{ arrayserver_install_dir }}/ArrayServer.cfg"
+    owner: "{{ app_user_name }}" 
+    group: "{{ app_group_name }}"

@@ -13,3 +13,11 @@
 - name: Include install_arrayserver.yaml
   include: install_arrayserver.yaml
   tags: install_arrayserver
+
+- name: Include r.yaml
+  include: install_r.yaml
+  tags: install_r
+
+- name: Include install_docker.yaml
+  include: install_docker.yaml
+  tags: install_docker

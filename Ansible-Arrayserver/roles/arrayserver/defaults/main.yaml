@@ -42,3 +42,16 @@ sqlite_cmd_path: "{{sqlite_install_dir}}/bin"
 
 #---Arryaserver-----#
 arrayserver_install_dir: "{{ base_dir }}/arrayserver"
+
+#----R ----------#
+r_packages:
+  - openblas
+  - openblas-threads
+  - openblas-openmp
+  - cairo-devel
+  - tcl-devel 
+  - tk-devel
+  - libcurl-devel 
+  - openssl 
+  - openssl-devel 
+  - libxml2-devel

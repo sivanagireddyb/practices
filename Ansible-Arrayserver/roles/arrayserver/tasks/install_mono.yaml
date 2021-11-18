@@ -1,11 +1,12 @@
-#- name: Install epel repo
-#  command: amazon-linux-extras install epel
-#  become: yes
-#
-#- name: Install Linux packages
-#  yum:
-#    name: "{{ dev_tool_packages }}"
-#    state: latest
+- name: Install epel repo
+  command: amazon-linux-extras install epel
+  become: yes
+
+- name: Install Linux packages
+  yum:
+    name: "{{ dev_tool_packages }}"
+    state: latest
+  become: yes
 
 #Installing MONO
 - name: Check for existing mono installation
