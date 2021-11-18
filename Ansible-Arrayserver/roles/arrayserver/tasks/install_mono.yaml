@@ -1,5 +1,5 @@
 - name: Install epel repo
-  command: amazon-linux-extras install epel
+  command: amazon-linux-extras install epel -y
   become: yes
 
 - name: Install Linux packages
