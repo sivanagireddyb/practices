@@ -1,0 +1,144 @@
+[License]
+##Copy/paste the license information you are provided by QDI at time of purchase. Any changes to this section will require an Array Server Restart
+
+CompanyName={{ company_name }}
+LicenseNumber={{ license_number }}
+ExpirationDate={{ expiration_date }}
+LicenseKey={{ license_key }}
+
+[Option]
+#Specify mono path for spawnoff jobs
+MonoPath={{ mono_cmd_path }}/mono
+MonoJobPath={{ mono_cmd_path }}/mono
+MonoSgenJobPath={{ mono_cmd_path }}/mono
+MonoSummaryPath={{ mono_cmd_path }}/mono
+SqlitePath=/usr/lib64/libsqlite3.so.0
+
+#Specify port for FTP, TCP and HTTP data transfer; make sure these ports are open
+#Port2 is using TCP for connections via API and GUI. Preferred connection. Port is using HTTP
+History=50
+Port=8064
+Port2=8065
+Port3=8066
+
+#Specify what FTP method along with dedicated data ports to use for transfer
+MultiThreadedFtp=True
+MultiThreadedFtpConnectionNumber=4
+PassiveMode=True
+DataPortBegin=60066
+DataPortEnd=60088
+
+#Directory Options
+##For AWS Server, highly recommend using EBS volume for the following paths. To create separation between reference files/data and Land, can use two mounts
+##For Base image, creating an EBS mountpoint of /ArrayServerHome
+BaseDirectory=/ArrayServerHome/Base
+OmicsoftDirectory=/ArrayServerHome/Omicsoft
+LandDirectory=/ArrayServerHome/Land
+TempDirectory=/ArrayServerHome/Temp
+
+#User management
+##Initial start up can leave Authorization to True and login as user admin. From here, admin can create additional users/admins. Once a different user is created, the admin UserID can be replaced below
+UserAuthorization=True
+AutoCreateNewUsers=True
+AdminUserID=admin
+HostedBy=ArrayServer
+SampleSetTabs=General,Platform,NewContact
+
+
+#Map folders to ArrayServer root
+[Folder]
+#DataFolder=/data/datafolder1
+
+[Filter]
+Title
+Description
+
+[SearchProject]
+Disease=Diseases
+Platform
+Organism
+
+
+[DBBackup]
+BackupDirectory=/ArrayServerHome/prod/DatabaseBackup
+IntervalInDays=1
+BackupStartTime=23:00
+#Copies essential databases (Users, UserGroups, Contrasts, Samples, Projects, Share, Lists, GenomeBrowser), keeping the two most recent versions. Platforms and Inference Reports can be automatically regenerated when ArrayServer is started, so are not backed up
+
+[Folder]
+#Map EBS or EFS volumes virtually to ArrayServer in this section
+
+[Filter]
+#Tags to filter projects by in the Server Tab Project browser
+
+
+[Cloud]
+Provider=Amazon
+#Specify region in which jobs will be launched
+Region=us-east-1
+
+AccessKey=$aws_access_key
+SecretKey=$aws_secret_key
+
+#specify s3 path to store reference files to be uploaded to spawned of EC2Instances
+
+OmicsoftCloudDirectory=s3://$bucketname/OmicsoftCloudDirectory
+
+#Specify a command to run prior to initializing oshell on cloud ec2s spawned off by Array Server
+CustomCommand=. /etc/profile.d/proxyscript.sh | sudo wget -nv -O /opt/oshell/OmicsoftUpdater.exe -c http://omicsoft.com/software_update/OmicsoftUpdater.exe
+
+#Specify Subnet of AWS in which to launch instances
+SubnetID=$subnetID
+SecurityGroupID=$subnetID
+#Explicitly use HTTPS for cloud communications
+UseHttp=False
+UseHttpForEC2=False
+UseHttpForSQS=False
+#Determine whether spawned off EC2s will have a public IP or only privateIP in the subnet
+AssociatePublicIpAddress=False
+
+#Specify Default instance types to be launched by Array Server. Starting with OmicSoft v11.3, support will be added for EC2s (m5 class and similar) with Nitro-type based EBS volumes. Please notes, AMI for launching will need to be Amazon Linux.
+OAlignInstanceType=m4.xlarge
+OSummaryInstanceType=m4.large
+
+##Specify maximum number of ec2s that can be launched by Array Server (MaxInstanceCount) and by user for individual job (MaxInstanceCountPerJob). Please note, these cannot exceed the limits within the AWS account.
+MaxInstanceCount=28
+MaxInstanceCountPerJob=8
+
+##Default job number in the GUI
+DefaultCloudJobNumber=48
+
+##http://www.arrayserver.com/wiki/index.php?title=UseReducedRedundancy
+UseReducedRedundancy=False
+
+##Enable encrypion of S3 data
+EnableDataEncryption=True
+
+##http://www.arrayserver.com/wiki/index.php?title=SimulateQueue
+SimulateQueue=False
+ 
+##Role used to launch instances within VPC
+InstanceProfileArn=arn:aws:iam::$$arrayserver-role
+
+Ami=$ami
+AmiSnapshot=$ami_snapshot
+
+##Toggle between SDK and CLI - SDK recommended
+UseCli=False
+
+
+[CloudFolder]
+#Create virtual mapping within Array Server for S3 data.
+CloudBucket1=s3://aws.bucket.1
+CloudBucket2=s3://aws.bucket.2
+
+
+[CloudInstanceTag]
+#add tags for cost tracking
+Application=ArrayServer
+Purpose=OmicSoftTesting
+ 
+[CloudVolumeTag]
+#add tags for cost tracking
+Application=ArrayServer
+Purpose=OmicSoftTesting

@@ -39,3 +39,6 @@ mono_cmd_path: "{{mono_install_dir}}/bin"
 sqlite_version: 3071401
 sqlite_install_dir: "{{ base_dir }}/sqlite-{{sqlite_version}}"
 sqlite_cmd_path: "{{sqlite_install_dir}}/bin"
+
+#---Arryaserver-----#
+arrayserver_install_dir: "{{ base_dir }}/arrayserver"
