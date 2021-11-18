@@ -87,9 +87,12 @@
       chdir: "{{ mono_install_dir }}"
   
   - name: Running "make install" for Mono
-    make:
+    #    make:
+    #  chdir: "{{ mono_install_dir }}"
+    #  target: install
+    command: make install 
+    args:
       chdir: "{{ mono_install_dir }}"
-      target: install
     become: yes
 
   - name: Making sure mono is installed
@@ -114,8 +117,17 @@
     - bash_profile
     - bashrc
 
+
 - name: Add the root certificates into the Mono Trust store
-  command: "{{mono_cmd_path}}/certmgr --ssl -m https://resources.omicsoft.com"
+  shell: |
+     echo |\
+     openssl s_client -connect resources.omicsoft.com:443 2>&1 |\
+     sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > cert.crt
+     {{mono_cmd_path}}/certmgr --add -c -m Trust  cert.crt
+     {{mono_cmd_path}}/certmgr --add -c -m CA  cert.crt
+     {{mono_cmd_path}}/certmgr --add -c -m AddressBook  cert.crt
+  args:
+     chdir: "{{ mono_install_dir }}"
   become: yes
 
 - name: Syncs Mono’s certificate store with the system certificate store
