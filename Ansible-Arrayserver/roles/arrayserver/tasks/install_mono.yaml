@@ -102,20 +102,14 @@
       state: absent      
   when: "mono_version|string not in current_mono.stdout" 
 
-- name: 'Add {{ mono_cmd_path }} if PATH does not exist'
+- name: Set paths for mono in bashprofile & bashrc
   lineinfile:
-    path: /etc/environment
-    line: 'PATH="{{ mono_cmd_path }}"'
-    insertafter: EOF
-  when: lookup('file', '/etc/environment') is not search('^\s*PATH\s*=')
-
-- name: 'Add {{ mono_cmd_path }} to PATH'
-  lineinfile:
-    path: /etc/environment
-    regexp: 'PATH=(["])((?!.*?{{ mono_cmd_path }}).*?)(["])$'
-    line: 'PATH=\1\2:{{ mono_cmd_path }}\3'
-    backrefs: yes
-  when: lookup('file', '/etc/environment') is search('^\s*PATH\s*=') 
+    create: yes
+    path: "/home/{{ app_user_name }}/.{{ item }}"
+    line: "export PATH=$PATH:{{mono_cmd_path}}"
+  with_items:
+    - bash_profile
+    - bashrc
 
 - name: Add the root certificates into the Mono Trust store
   command: "{{mono_cmd_path}}/certmgr --ssl -m https://resources.omicsoft.com"
