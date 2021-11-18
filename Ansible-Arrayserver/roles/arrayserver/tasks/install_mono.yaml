@@ -52,7 +52,7 @@
       chdir: "{{ mono_old_install_dir }}"
     become: yes
 #  when: "mono_old_version|string not in current_mono.stdout" 
-  tags: mono_old_version
+  tags: install_mono_old
 
 # Installing Mono New version
 - name: Mono {{ mono_version }} install
