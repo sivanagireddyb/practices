@@ -1,8 +1,15 @@
 - name: Include install_mono.yaml
   include: install_mono.yaml
+  tags: install_mono
 
 - name: Include install_sqlite.yaml
   include: install_sqlite.yaml
+  tags: install_sqlite
 
-- name: Include install.yaml
-  include: install.yml
+- name: Include install_awscli.yaml
+  include: install_awscli.yaml
+  tags: install_awscli
+
+- name: Include install_arrayserver.yaml
+  include: install_arrayserver.yaml
+  tags: install_arrayserver

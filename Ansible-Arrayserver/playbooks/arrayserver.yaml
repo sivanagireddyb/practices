@@ -1,4 +1,5 @@
 ---
 -  hosts: localhost 
    roles: 
+   #     - { role: roles/awscli }
      - { role: roles/arrayserver }

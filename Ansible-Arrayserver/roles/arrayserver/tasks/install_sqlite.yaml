@@ -1,35 +1,48 @@
-- name: Download sqlite {{ sqlite_version }}
-  get_url:
-    url: http://www.sqlite.org/sqlite-autoconf-{{sqlite_version}}.tar.gz
-    dest: "sqlite-autoconf-{{sqlite_version}}.tar.gz"
-
-- name: Unarchive Sqlite {{ sqlite_version }}
-  ansible.builtin.unarchive:
-    src: "sqlite-autoconf-{{sqlite_version}}.tar.gz"
-    dest: "{{sqlite_install_dir}}"
-    creates: "{{sqlite_install_dir}}/bin"
-    extra_opts: [--strip-components=1]
-    owner: "{{ app_user_name }}"
-    group: "{{ app_group_name }}"     
-    remote_src: yes
-
-- name: Running ./configure for Sqlite
-  command: "./configure  --prefix={{sqlite_install_dir}} >configure.log 2>&1"
-  args: 
-    chdir: "{{ sqlite_install_dir }}"
-
-- name: Running "make" for Sqlite
-  command: make >make.log 2>&1
-  args: 
-    chdir: "{{sqlite_install_dir}}"
-
-- name: Running "make install" for Sqlite
-  command: make install >makeinstall.log 2>&1
-  args: 
-    chdir: "{{sqlite_install_dir}}"
-  become: yes
-
-- name: Making sure sqlite is installed
+- name: Check for existing sqlite installation
   shell: "{{ sqlite_cmd_path }}/sqlite3 --version"
-  register: sqlite_op
-  failed_when: "sqlite_op.rc != 0" 
+  register: sqlite3_op
+  ignore_errors: true
+
+- name: Install Sqlite
+  block:
+  - name: ensure Sqlite downlaod dir {{sqlite_version}} exists
+    file:
+      path: "{{ sqlite_install_dir }}"
+      state: directory
+  
+  - name: Download sqlite {{ sqlite_version }}
+    get_url:
+      url: http://www.sqlite.org/sqlite-autoconf-{{sqlite_version}}.tar.gz
+      dest: "{{ base_dir }}/"
+  
+  - name: Unarchive Sqlite {{ sqlite_version }}
+    ansible.builtin.unarchive:
+      src: "{{ base_dir }}/sqlite-autoconf-{{sqlite_version}}.tar.gz"
+      dest: "{{sqlite_install_dir}}"
+      creates: "{{sqlite_install_dir}}/Makefile.in"
+      extra_opts: [--strip-components=1]
+      owner: "{{ app_user_name }}"
+      group: "{{ app_group_name }}"     
+      remote_src: yes
+  
+  - name: Running ./configure for Sqlite
+    command: "./configure  --prefix={{sqlite_install_dir}}"
+    args: 
+      chdir: "{{ sqlite_install_dir }}"
+  
+  - name: Running "make" for Sqlite
+    command: make
+    args: 
+      chdir: "{{sqlite_install_dir}}"
+  
+  - name: Running "make install" for Sqlite
+    command: make install
+    args: 
+      chdir: "{{sqlite_install_dir}}"
+    become: yes
+  
+  - name: Making sure sqlite is installed
+    shell: "{{ sqlite_cmd_path }}/sqlite3 --version"
+    register: sqlite_op
+    failed_when: "sqlite_op.rc != 0" 
+  when: "sqlite3_op.rc != 0"

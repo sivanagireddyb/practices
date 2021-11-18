@@ -1,0 +1,20 @@
+---
+- name: Install AWS CLI version 2
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: "{{ base_dir }}/awscli-exe-linux-x86_64.zip"
+
+- name: Unpack awscliv2
+  unarchive:
+    src: "{{ base_dir }}/awscli-exe-linux-x86_64.zip"
+    dest: "{{ base_dir }}/"
+
+- name: running aws cli version 2 executable
+  command: "{{ base_dir }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
+  become: true
+
+- name: Validate installation
+  command: aws --version
+  register: awscli_op
+  failed_when: awscli_op.rc != 0
+

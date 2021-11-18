@@ -1,0 +1,37 @@
+- name: Create base folder for arrayserver
+  file: 
+    path: "{{ arrayserver_install_dir }}"
+    state: present
+
+- name: Download arrayserver 
+  get_url:
+    url: http://omicsoft.com/software_update/OmicsoftUpdater.exe
+    dest: "{{ arrayserver_install_dir }}"
+
+- name: Create arrayserver exe
+  command: touch ArrayServerLinuxBeta.exe && mono ./OmicsoftUpdater.exe
+  args: 
+    chdir: "{{ arrayserver_install_dir }}"
+
+- name: Check ArrayServerLinuxBeta version
+  command: mono ArrayServerLinuxBeta.exe --version
+  args: 
+    chdir: "{{ arrayserver_install_dir }}"
+  register: arrayserver_ver_op
+  failed_when: arrayserver_ver_op.rc != 0
+
+- name: Downlaod Arrayserver config template
+  get_url:
+    url: https://resources.omicsoft.com/software/ArrayServer/ArrayServerConfigTemplate.zip
+    dest: "{{ arrayserver_install_dir }}"
+
+- name: Unzip ArrayServerConfigTemplate.zip
+  ansible.builtin.unarchive:
+    src: "{{ arrayserver_install_dir }}/ArrayServerConfigTemplate.zip"
+    dest: "{{ arrayserver_install_dir }}/"
+    #    creates: "{{ mono_old_install_dir }}"
+    owner: "{{ app_user_name }}"
+    group: "{{ app_group_name }}"
+    #    extra_opts: [--strip-components=1]
+    remote_src: yes
+

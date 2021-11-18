@@ -32,9 +32,10 @@ mono_old_version: 4.0.4.1
 mono_version: 6.12.0.122
 mono_old_install_dir: "{{ base_dir }}/mono-{{mono_old_version}}"
 mono_install_dir: "{{ base_dir }}/mono-{{mono_version}}"
+mono_old_cmd_path: "{{mono_old_install_dir}}/bin"
 mono_cmd_path: "{{mono_install_dir}}/bin"
 
 #----sqlite---------#
 sqlite_version: 3071401
-sqlite_install_dir: "{{ base_dir }}/sqlite"
+sqlite_install_dir: "{{ base_dir }}/sqlite-{{sqlite_version}}"
 sqlite_cmd_path: "{{sqlite_install_dir}}/bin"
