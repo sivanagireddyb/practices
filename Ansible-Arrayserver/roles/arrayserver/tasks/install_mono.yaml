@@ -9,7 +9,7 @@
 
 #Installing MONO
 - name: Check for existing mono installation
-  command: "{{ mono_old_cmd_path }}/mono --version"
+  command: "{{ mono_cmd_path }}/mono --version"
   ignore_errors: true
   register: current_mono
 
