@@ -51,8 +51,8 @@
     args: 
       chdir: "{{ mono_old_install_dir }}"
     become: yes
-  when: "mono_old_version|string not in current_mono.stdout" 
-
+#  when: "mono_old_version|string not in current_mono.stdout" 
+  tags: mono_old_version
 
 # Installing Mono New version
 - name: Mono {{ mono_version }} install
@@ -101,7 +101,9 @@
     file: 
       path: "{{ mono_install_dir }}.tar.xz"
       state: absent      
-  when: "mono_version|string not in current_mono.stdout" 
+  tags: make_mono  
+#  when: "mono_version|string not in current_mono.stdout"
+
 
 - name: Set paths for mono in bashprofile & bashrc
   lineinfile:
