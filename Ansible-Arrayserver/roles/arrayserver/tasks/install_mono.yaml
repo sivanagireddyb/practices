@@ -10,14 +10,14 @@
 
 #Installing MONO
 - name: Check for existing mono {{mono_old_version}} installation
-  shell: "export PATH={{ mono_old_cmd_path }} && mono --version"
+  shell: "{{ mono_old_cmd_path }}/mono --version"
   changed_when: false
   failed_when: false
   register: current_old_mono
   tags: install_mono_old
 
 - name: Check for existing mono {{mono_version}} installation
-  shell: "export PATH={{ mono_cmd_path }} && mono --version"
+  shell: "{{ mono_cmd_path }}/mono --version"
   changed_when: false
   failed_when: false
   register: current_new_mono
