@@ -9,10 +9,19 @@
   become: yes
 
 #Installing MONO
-- name: Check for existing mono installation
-  command: "{{ mono_cmd_path }}/mono --version"
-  ignore_errors: true
-  register: current_mono
+- name: Check for existing mono {{mono_old_version}} installation
+  shell: "export PATH={{ mono_old_cmd_path }} && mono --version"
+  changed_when: false
+  failed_when: false
+  register: current_old_mono
+  tags: install_mono_old
+
+- name: Check for existing mono {{mono_version}} installation
+  shell: "export PATH={{ mono_cmd_path }} && mono --version"
+  changed_when: false
+  failed_when: false
+  register: current_new_mono
+  tags: install_new_mono  
 
 - name: Install Mono
   block:
@@ -36,22 +45,21 @@
       extra_opts: [--strip-components=1]
       remote_src: yes
   
-  - name: Running ./configure for Mono
+  - name: Running ./configure for Mono {{mono_old_version}}
     command: "./configure  --prefix={{ mono_old_install_dir }} --with-large-heap=yes"
     args: 
       chdir: "{{ mono_old_install_dir }}"
   
-  - name: Running "make" for Mono
-    command: make
-    args: 
+  - name: Running "make" for Mono {{mono_old_version}}
+    make:
       chdir: "{{ mono_old_install_dir }}"
   
-  - name: Running "make install" for Mono
+  - name: Running "make install" for Mono {{mono_old_version}}
     command: make install
     args: 
       chdir: "{{ mono_old_install_dir }}"
     become: yes
-#  when: "mono_old_version|string not in current_mono.stdout" 
+  when: "mono_old_version|string not in current_old_mono.stdout" 
   tags: install_mono_old
 
 # Installing Mono New version
@@ -77,17 +85,17 @@
       group: "{{ app_group_name }}"     
       remote_src: yes
   
-  - name: Running ./configure for Mono
+  - name: Running ./configure for Mono {{mono_version}}
     command: "./configure  --prefix={{ mono_install_dir }} --with-large-heap=yes --enable-big-arrays=yes"
     args: 
       chdir: "{{ mono_install_dir }}"
   
-  - name: Running "make" for Mono
+  - name: Running "make" for Mono {{mono_version}}
     make:
       chdir: "{{ mono_install_dir }}"
   
-  - name: Running "make install" for Mono
-    #    make:
+  - name: Running "make install" for Mono {{mono_version}}
+    # make:
     #  chdir: "{{ mono_install_dir }}"
     #  target: install
     command: make install 
@@ -104,9 +112,8 @@
     file: 
       path: "{{ mono_install_dir }}.tar.xz"
       state: absent      
-  tags: make_mono  
-#  when: "mono_version|string not in current_mono.stdout"
-
+  tags: install_new_mono  
+  when: "mono_version|string not in current_new_mono.stdout"
 
 - name: Set paths for mono in bashprofile & bashrc
   lineinfile:
